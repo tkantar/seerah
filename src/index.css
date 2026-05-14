@@ -1,0 +1,114 @@
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-arabic: "Amiri", "Noto Naskh Arabic", "Scheherazade New", serif;
+  --font-display: "Cormorant Garamond", "Inter", serif;
+
+  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-lg: 18px;
+
+  color-scheme: light dark;
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme="light"] {
+  --bg:           #faf7f2;
+  --bg-elev:     #ffffff;
+  --bg-soft:     #f1ece3;
+  --bg-muted:    #ece6da;
+  --text:        #1d1b18;
+  --text-soft:   #4a463f;
+  --text-faint:  #7a7468;
+  --border:      #e3ddd0;
+  --border-soft: #efe9dc;
+  --accent:      #7a6033;
+  --accent-soft: #a98a4f;
+  --accent-bg:   #f3ead7;
+  --accent-bg-strong: #e9dcbe;
+  --shadow-sm:  0 1px 2px rgba(50, 40, 22, 0.06);
+  --shadow:     0 6px 24px -8px rgba(50, 40, 22, 0.18), 0 2px 6px rgba(50, 40, 22, 0.05);
+  --shadow-lg:  0 24px 60px -20px rgba(50, 40, 22, 0.25);
+  --hairline:   rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="dark"] {
+  --bg:           #100e0c;
+  --bg-elev:      #181613;
+  --bg-soft:      #1f1b16;
+  --bg-muted:     #25201a;
+  --text:         #f3ede1;
+  --text-soft:    #c9c1b2;
+  --text-faint:   #8c8473;
+  --border:       #2e2820;
+  --border-soft:  #25201a;
+  --accent:       #d6b574;
+  --accent-soft:  #b8945a;
+  --accent-bg:    rgba(214, 181, 116, 0.12);
+  --accent-bg-strong: rgba(214, 181, 116, 0.22);
+  --shadow-sm:    0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow:       0 8px 32px -8px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg:    0 28px 80px -20px rgba(0, 0, 0, 0.7);
+  --hairline:     rgba(255, 255, 255, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--accent-bg-strong);
+  color: var(--text);
+}
+
+/* Subtle decorative noise overlay across the whole page */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(1000px 600px at 10% -10%, var(--accent-bg) 0%, transparent 50%),
+    radial-gradient(900px 500px at 110% 110%, var(--accent-bg) 0%, transparent 50%);
+  z-index: 0;
+}
+
+/* Arabic typography */
+.arabic {
+  font-family: var(--font-arabic);
+  font-size: 1.5em;
+  line-height: 2;
+  direction: rtl;
+  text-align: right;
+  color: var(--text);
+}

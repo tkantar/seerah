@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"C:/Users/tevfi/Documents/projects/seerah/_extract\")",
+      "Bash(cp \"C:/Users/tevfi/Documents/Islam/Vorträge/Seerah Dars.pptx\" \"C:/Users/tevfi/Documents/projects/seerah/_extract/seerah.zip\")",
+      "Bash(unzip -q seerah.zip -d unpacked)",
+      "Bash(grep -E \"^slide[0-9]+\\\\.xml$\")",
+      "Bash(python extract.py)",
+      "Bash(where python *)",
+      "Bash(node -e \"const d=require\\('./slides.json'\\);for\\(let i=0;i<20;i++\\){const s=d[i];const lines=s.paragraphs.map\\(p=>p.map\\(r=>r.text\\).join\\(''\\)\\).filter\\(Boolean\\);console.log\\('--- slide',s.index,'---'\\);console.log\\(lines.slice\\(0,8\\).join\\('\\\\n'\\)\\);}\")",
+      "Bash(node -e ' *)",
+      "Bash(awk '{print $5}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5173/src/data/slides.json -o /dev/null -w \"%{http_code}\")",
+      "Bash(rm -f .dev.log)",
+      "Bash(pkill -f \"vite\")"
+    ]
+  }
+}
