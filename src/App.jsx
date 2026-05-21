@@ -1,25 +1,42 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import data from "./data/slides.json";
 import Sidebar from "./components/Sidebar.jsx";
-import SlideView from "./components/SlideView.jsx";
+import PageView from "./components/PageView.jsx";
 import Hero from "./components/Hero.jsx";
 import ChapterIndex from "./components/ChapterIndex.jsx";
 import "./App.css";
 
-const { chapters, slides } = data;
-const slideByIndex = new Map(slides.map((s) => [s.index, s]));
+const { chapters, pages } = data;
+const pageByIndex = new Map(pages.map((p) => [p.index, p]));
+const pagesByChapter = chapters.reduce((acc, c) => {
+  acc[c.slug] = pages.filter((p) => p.chapter === c.slug);
+  return acc;
+}, {});
+// Map any source pptx slide index to the page that contains it (used to
+// translate legacy `#/slide/N` URLs).
+const pageBySlide = new Map();
+for (const p of pages) {
+  for (const s of p.sections) {
+    pageBySlide.set(s.slideIndex, p.index);
+  }
+}
 
 function parseHash() {
   const h = window.location.hash.replace(/^#\/?/, "");
   if (!h) return { route: "home" };
   const [first, second] = h.split("/");
+  if (first === "page" && second) {
+    const n = parseInt(second, 10);
+    if (pageByIndex.has(n)) return { route: "page", pageIndex: n };
+  }
   if (first === "slide" && second) {
     const n = parseInt(second, 10);
-    if (slideByIndex.has(n)) return { route: "slide", slideIndex: n };
+    const pIdx = pageBySlide.get(n);
+    if (pIdx) return { route: "page", pageIndex: pIdx };
   }
   if (first === "chapter" && second) {
     const c = chapters.find((x) => x.slug === second);
-    if (c) return { route: "slide", slideIndex: c.startSlide };
+    if (c?.startPage) return { route: "page", pageIndex: c.startPage };
   }
   return { route: "home" };
 }
@@ -34,22 +51,24 @@ export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const [view, setView] = useState(parseHash);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Which chapter section is open in the sidebar. Auto-syncs to the active
+  // chapter as the user navigates, but the user can override it by clicking
+  // the chevron next to any chapter.
+  const [openChapter, setOpenChapter] = useState(null);
 
-  // Apply theme
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("seerah-theme", theme);
   }, [theme]);
 
-  // Sync with URL hash
   useEffect(() => {
     const onHashChange = () => setView(parseHash());
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  const goToSlide = useCallback((slideIndex) => {
-    window.location.hash = `#/slide/${slideIndex}`;
+  const goToPage = useCallback((pageIndex) => {
+    window.location.hash = `#/page/${pageIndex}`;
     setSidebarOpen(false);
     window.scrollTo({ top: 0, behavior: "instant" });
   }, []);
@@ -63,58 +82,76 @@ export default function App() {
   const goToChapter = useCallback(
     (slug) => {
       const c = chapters.find((x) => x.slug === slug);
-      if (c) goToSlide(c.startSlide);
+      if (c?.startPage) goToPage(c.startPage);
     },
-    [goToSlide]
+    [goToPage]
   );
 
-  const currentSlide = view.route === "slide" ? slideByIndex.get(view.slideIndex) : null;
+  const currentPage = view.route === "page" ? pageByIndex.get(view.pageIndex) : null;
   const currentChapter = useMemo(() => {
-    if (!currentSlide) return null;
-    return chapters.find((c) => c.slug === currentSlide.chapter);
-  }, [currentSlide]);
+    if (!currentPage) return null;
+    return chapters.find((c) => c.slug === currentPage.chapter);
+  }, [currentPage]);
   const currentChapterIndex = useMemo(() => {
     if (!currentChapter) return -1;
     return chapters.findIndex((c) => c.slug === currentChapter.slug);
   }, [currentChapter]);
 
-  const prevSlide = currentSlide && currentSlide.index > 1 ? slideByIndex.get(currentSlide.index - 1) : null;
-  const nextSlide = currentSlide && currentSlide.index < slides[slides.length - 1].index
-    ? slideByIndex.get(currentSlide.index + 1)
-    : null;
+  const prevPage =
+    currentPage && currentPage.index > 1 ? pageByIndex.get(currentPage.index - 1) : null;
+  const nextPage =
+    currentPage && currentPage.index < pages[pages.length - 1].index
+      ? pageByIndex.get(currentPage.index + 1)
+      : null;
 
-  // Keyboard navigation
   useEffect(() => {
-    if (view.route !== "slide") return;
+    if (view.route !== "page") return;
     const onKey = (e) => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
       if (e.key === "ArrowRight" || e.key === "PageDown") {
-        if (nextSlide) goToSlide(nextSlide.index);
+        if (nextPage) goToPage(nextPage.index);
       } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
-        if (prevSlide) goToSlide(prevSlide.index);
+        if (prevPage) goToPage(prevPage.index);
       } else if (e.key === "Escape") {
         goHome();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [view, prevSlide, nextSlide, goToSlide, goHome]);
+  }, [view, prevPage, nextPage, goToPage, goHome]);
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "dark" ? "light" : "dark"));
   }, []);
 
-  const activeChapterSlug = currentChapter?.slug;
+  const activeChapterSlug = currentChapter?.slug ?? null;
+  // If user expanded a chapter that isn't the one they then navigated to,
+  // clear the manual expansion so the active chapter shows its pages again.
+  const [lastActive, setLastActive] = useState(activeChapterSlug);
+  if (lastActive !== activeChapterSlug) {
+    setLastActive(activeChapterSlug);
+    if (openChapter && openChapter !== activeChapterSlug) setOpenChapter(null);
+  }
+
+  const toggleChapter = useCallback((slug) => {
+    setOpenChapter((cur) => (cur === slug ? null : slug));
+  }, []);
 
   return (
     <div className="app">
       {sidebarOpen && <div className="backdrop" onClick={() => setSidebarOpen(false)} />}
       <Sidebar
         chapters={chapters}
+        pagesByChapter={pagesByChapter}
         activeChapterSlug={activeChapterSlug}
+        activePageIndex={currentPage?.index ?? null}
+        openChapter={openChapter}
+        onToggleChapter={toggleChapter}
         onSelectChapter={goToChapter}
+        onSelectPage={goToPage}
         onSelectHome={goHome}
         open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         theme={theme}
         onToggleTheme={toggleTheme}
       />
@@ -132,10 +169,7 @@ export default function App() {
           </button>
 
           <div className="topbar__crumbs">
-            <button
-              onClick={goHome}
-              style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", padding: 0, fontSize: "inherit", fontFamily: "inherit" }}
-            >
+            <button className="topbar__home" onClick={goHome}>
               Seerah Dars
             </button>
             {currentChapter && (
@@ -146,9 +180,9 @@ export default function App() {
             )}
           </div>
 
-          {currentSlide && (
+          {currentPage && (
             <div className="topbar__progress">
-              Folie {currentSlide.index} / {slides.length}
+              {currentPage.index} / {pages.length}
             </div>
           )}
         </div>
@@ -156,36 +190,36 @@ export default function App() {
         {view.route === "home" ? (
           <>
             <Hero
-              onStart={() => goToSlide(1)}
+              onStart={() => goToPage(1)}
               totalChapters={chapters.length}
-              totalSlides={slides.length}
+              totalPages={pages.length}
             />
             <ChapterIndex chapters={chapters} onSelect={goToChapter} />
           </>
-        ) : currentSlide ? (
+        ) : currentPage ? (
           <>
-            <SlideView
-              slide={currentSlide}
+            <PageView
+              page={currentPage}
               chapter={currentChapter}
               chapterIndex={currentChapterIndex}
             />
-            <div className="reader" style={{ paddingTop: 0 }}>
+            <div className="reader reader--pager">
               <div className="pager">
                 <button
                   className="pager__btn"
-                  disabled={!prevSlide}
-                  onClick={() => prevSlide && goToSlide(prevSlide.index)}
+                  disabled={!prevPage}
+                  onClick={() => prevPage && goToPage(prevPage.index)}
                 >
                   <span className="label">← Zurück</span>
-                  <span className="title">{prevSlide ? prevSlide.title : "Anfang erreicht"}</span>
+                  <span className="title">{prevPage ? prevPage.title : "Anfang erreicht"}</span>
                 </button>
                 <button
                   className="pager__btn pager__btn--next"
-                  disabled={!nextSlide}
-                  onClick={() => nextSlide && goToSlide(nextSlide.index)}
+                  disabled={!nextPage}
+                  onClick={() => nextPage && goToPage(nextPage.index)}
                 >
                   <span className="label">Weiter →</span>
-                  <span className="title">{nextSlide ? nextSlide.title : "Ende erreicht"}</span>
+                  <span className="title">{nextPage ? nextPage.title : "Ende erreicht"}</span>
                 </button>
               </div>
             </div>

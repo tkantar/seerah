@@ -12,7 +12,7 @@ export default function ChapterIndex({ chapters, onSelect }) {
             <span className="toc__num">Kapitel {String(i + 1).padStart(2, "0")}</span>
             <h3 className="toc__title">{c.title}</h3>
             <span className="toc__meta">
-              {c.slideCount} Folie{c.slideCount !== 1 ? "n" : ""} · {c.startSlide}–{c.endSlide}
+              {c.pageCount} {c.pageCount === 1 ? "Seite" : "Seiten"}
             </span>
           </button>
         ))}

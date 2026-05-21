@@ -13,7 +13,18 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
       "Bash(curl -s http://localhost:5173/src/data/slides.json -o /dev/null -w \"%{http_code}\")",
       "Bash(rm -f .dev.log)",
-      "Bash(pkill -f \"vite\")"
+      "Bash(pkill -f \"vite\")",
+      "Bash(node _extract/extract.mjs)",
+      "Bash(node _extract/inspect.mjs)",
+      "Bash(node _extract/probe.mjs)",
+      "Bash(node _extract/build-slides.mjs)",
+      "Bash(npm run *)",
+      "WebFetch(domain:localhost)",
+      "Bash(curl *)",
+      "Bash(node _extract/verify-images.mjs)",
+      "Bash(grep -E \"slide\\(332|333|330\\)\\\\.xml$\")",
+      "Bash(node _extract/probe2.mjs)",
+      "Bash(node _extract/stats.mjs)"
     ]
   }
 }

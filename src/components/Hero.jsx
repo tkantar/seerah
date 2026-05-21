@@ -1,12 +1,14 @@
-export default function Hero({ onStart, totalChapters, totalSlides }) {
+export default function Hero({ onStart, totalChapters, totalPages }) {
   return (
     <section className="hero">
       <p className="hero__bismillah">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
       <div className="hero__eyebrow">Seerah Dars</div>
-      <h1 className="hero__title">Das Leben des Propheten <span style={{whiteSpace:"nowrap"}}>Muhammad ﷺ</span></h1>
+      <h1 className="hero__title">
+        Das Leben des Propheten <span style={{ whiteSpace: "nowrap" }}>Muhammad ﷺ</span>
+      </h1>
       <p className="hero__subtitle">
-        Ein moderner, durchklickbarer Dars in {totalChapters} Kapiteln und {totalSlides} Folien –
-        von der Welt vor dem Islam bis zum Isra & Mi‘raj.
+        Ein moderner, durchklickbarer Dars in {totalChapters} Kapiteln und {totalPages} Seiten –
+        von der Welt vor dem Islam bis zur Bay'a von 'Aqaba.
       </p>
       <button className="hero__cta" onClick={onStart}>
         Dars beginnen
