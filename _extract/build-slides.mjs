@@ -42,6 +42,7 @@ const chapters = [
   { title: "Isra & Mi‘raj",                    slug: "isra-miraj",         startSlide: 261 },
   { title: "Nach Mi‘raj – Suche nach Helfern", slug: "nach-miraj",         startSlide: 310 },
   { title: "Yathrib & Aqaba",                  slug: "aqaba-yathrib",      startSlide: 320 },
+  { title: "Die Hijra nach Madina",            slug: "hijra-madina",       startSlide: 353 },
 ];
 
 // Build slide -> image mapping from the .rels files.
