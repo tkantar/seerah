@@ -43,6 +43,9 @@ const chapters = [
   { title: "Nach Mi‘raj – Suche nach Helfern", slug: "nach-miraj",         startSlide: 310 },
   { title: "Yathrib & Aqaba",                  slug: "aqaba-yathrib",      startSlide: 320 },
   { title: "Die Hijra nach Madina",            slug: "hijra-madina",       startSlide: 353 },
+  { title: "Auswanderung des Propheten",       slug: "auswanderung-prophet",startSlide: 370 },
+  { title: "Ankunft in Quba",                  slug: "ankunft-quba",       startSlide: 389 },
+  { title: "Einzug in Madina",                 slug: "einzug-madina",      startSlide: 408 },
 ];
 
 // Build slide -> image mapping from the .rels files.
