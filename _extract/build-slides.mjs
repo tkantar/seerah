@@ -46,6 +46,12 @@ const chapters = [
   { title: "Auswanderung des Propheten",       slug: "auswanderung-prophet",startSlide: 370 },
   { title: "Ankunft in Quba",                  slug: "ankunft-quba",       startSlide: 389 },
   { title: "Einzug in Madina",                 slug: "einzug-madina",      startSlide: 408 },
+  { title: "Bau der Prophetenmoschee",         slug: "moscheebau",         startSlide: 426 },
+  { title: "Der Azan",                         slug: "azan",               startSlide: 436 },
+  { title: "Exkurs: Erweiterungen der Moschee",slug: "moschee-erweiterungen",startSlide: 441 },
+  { title: "Exkurs: Hijra-Kalender",           slug: "hijra-kalender",     startSlide: 445 },
+  { title: "Verbrüderung in Madina",           slug: "verbruederung",      startSlide: 450 },
+  { title: "Verfassung von Madina",            slug: "verfassung-madina",  startSlide: 459 },
 ];
 
 // Build slide -> image mapping from the .rels files.
